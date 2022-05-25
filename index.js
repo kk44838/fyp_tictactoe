@@ -11,6 +11,7 @@ var joinGame = document.getElementById('join-game');
 var player;
 var gameOver = false;
 var accounts;
+var betAmount;
 
 
 if (typeof web3 !== 'undefined') {
@@ -72,21 +73,20 @@ var checkWin = function(){
                 }
                 gameOver = true;
                 document.querySelector('#game-messages').innerHTML = displayResult;
+
                 for (var i = 0; i < 9; i++){
                     boxes[i].removeEventListener('click', clickHandler);
                 }
-            } else if (win == 4){
+
+                return true;
+            } else if (win == 0){
                 document.querySelector('#game-messages').innerHTML = "Waiting for players...";
+            } else if (win == 4) {
+                document.querySelector('#game-messages').innerHTML = "Game in progress...";
             }
         });
-        if (win>0 && win<4){
-            return true;
-        } else {
-            return false;
-        }
-    } else { 
-        return false;
     }
+    return false;
 }
 
 var render = function(){
@@ -113,21 +113,16 @@ var render = function(){
         checkWin();
         if (!gameOver){
             turnMessageHandler();
-        } else {
-            TicTacToe.paidWinner().then(function(res){
-                document.querySelector('#winner-paid').innerHTML = "Winner paid: " + res[0].words[0];
-            });
         }
     }
 }
 
 var turnMessageHandler = function(){
     TicTacToe.turn().then(function(res){
-        turnDisplay.innerHTML = "Player Turn: " + res[0].words[0]
         if (res[0].words[0] == player){
-            document.querySelector('#game-messages').innerHTML = "Your turn !";
+            turnDisplay.innerHTML = "Your turn !";
         } else {
-            document.querySelector('#game-messages').innerHTML = "Not your turn !";
+            turnDisplay.innerHTML = "Not your turn !";
         }
     });
 }
@@ -138,9 +133,11 @@ var newGameHandler = function(){
     if (typeof TicTacToe != 'undefined'){
         console.log("There seems to be an existing game going on already");
     } else{
-        var opponentAddress = document.getElementById('opponentAdress').value
+        var opponentAddress = document.getElementById('opponent-address').value
+        betAmount = document.getElementById('bet-amount').value;
+
         console.log(opponentAddress)
-        TicTacToeContract.new(opponentAddress)
+        TicTacToeContract.new(opponentAddress, { from: accounts[0], gas: '3000000',  value: web3.utils.toWei(betAmount.toString(), "ether")})
         .then(function(txHash) {
             var waitForTransaction = setInterval(function(){
                 eth.getTransactionReceipt(txHash, function(err, receipt){
@@ -148,98 +145,46 @@ var newGameHandler = function(){
                         clearInterval(waitForTransaction);
                         TicTacToe = TicTacToeContract.at(receipt.contractAddress);
                         //display the contract address to share with the opponent
-
-                        document.querySelector('#betAmountField').innerHTML = 
-                    "<input type=\"text\" id=\"betAmount\" placeholder=\"Place Your Bet\"></input><button id=\"start-game\" onclick=\"startGameHandler()\">Place Bet</button> <br><br>";
-                    }
-                })
-            }, 300);
-        
-        })
-        
-    }
-}
-
-var startGameHandler = async function(){
-
-    if (typeof TicTacToe != 'undefined'){
-        var betAmount = document.getElementById('betAmount');
-        if (!betAmount) {
-            betAmount = 1;
-        } else {
-            betAmount = betAmount.value;
-        }
-        console.log(betAmount);
-
-        // await ethereum.request({ method: 'eth_requestAccounts' });
-        // const signer = provider.getSigner();
-        // await signer;
-        // await contract.connect(signer).deposit(/*arguments*/, {value: ethdeposit});
-        // { from: accounts[0], gas: '3000000',  value: web3.utils.toWei(1, "ether")}
-
-
-        /* I need to make the bet amount the value of the join function call it is not working right now*/
-        TicTacToe.join().then(function(txHash) {
-            var waitForTransaction = setInterval(function(){
-                eth.getTransactionReceipt(txHash, function(err, receipt){
-                    if (receipt) {
-                        clearInterval(waitForTransaction);
-                        //display the contract address to share with the opponent
-
-                        document.querySelector('#betAmountField').innerHTML +=  
-                            "BET AMOUNT OF " + betAmount + " PLACED <br><br>" 
-                            + "Share the contract address with your opponnent: " + String(TicTacToe.address) + "<br><br>";
-                        document.querySelector('#player').innerHTML ="Player1"
+                        
+                        document.querySelector('#new-game-address').innerHTML = "BET AMOUNT OF " + betAmount + " PLACED <br><br>" 
+                        + "Share the contract address with your opponnent: " + String(TicTacToe.address) + "<br><br>";
                         player = 1;
+
+                        document.querySelector('#player').innerHTML = "Player 1";
                     }
                 })
             }, 300);
         
         })
-
-        // TicTacToe.join({ from: ethereum.selectedAddress, gas: '3000000',  value: web3.utils.toWei(1, "ether")}, function(err, res){ });
         
-
-
-        // await ethereum.request({ method: 'eth_accounts' }).then(function (accounts) {
-        //     TicTacToe.join({ from: accounts[0], gas: '3000000',  value: web3.utils.toWei(1, "ether")}, function(err, res){ });
-        // }).then(function() {
-        //     document.querySelector('#betAmountField').innerHTML = 
-        //     "<input type=\"text\" id=\"betAmount\" placeholder=\"BET PLACED\"></input><button id=\"start-game\" onclick=\"() => startGameHandler()\">BET PLACED</button> <br><br>";
-        //     }
-        // )
-        
-        // .then(res => 
-        //     console.log('Success', res))
-        // .catch(err => console.log(err)) 
-        // .then(function(txHash){   
-        //     // var contractAddress;
-        //     var waitForTransaction = setInterval(function(){
-        //         eth.getTransactionReceipt(txHash, function(err, receipt){
-        //             if (receipt) {
-        //                 clearInterval(waitForTransaction);
-        //                 //display the contract address to share with the opponent
-        //                 document.querySelector('#newGameAddress').innerHTML = 
-        //                     "Share the contract address with your opponnent: " + String(receipt.contractAddress) + "<br><br>";
-        //                 document.querySelector('#player').innerHTML ="Player1"
-        //                 player = 1;
-        //             }
-        //         })
-        //     }, 300);
-        // })
-    } else {
-        console.log("There doesn't seem to be an existing game going on already");
     }
-    
 }
 
 var joinGameHandler = function(){
-    //idem for joining a game
-    var contractAddress = document.getElementById('contract-ID-tojoin').value.trim();
-    TicTacToe = TicTacToeContract.at(contractAddress);
-    TicTacToe.join();
-    document.querySelector('#player').innerHTML = "Player2";
-    player = 2;
+     //idem for joining a game
+     var contractAddress = document.getElementById('contract-ID-tojoin').value.trim();
+     TicTacToe = TicTacToeContract.at(contractAddress);
+ 
+     TicTacToe.betAmount().then(function(res) {
+         console.log(res)
+         betAmount = web3.utils.fromWei(res[0].toString(), 'ether');
+         if (betAmount == 0) {
+             document.querySelector('#bet-amount-field-join').innerHTML = "Try Again..."
+         } else {
+             document.querySelector('#bet-amount-field-join').innerHTML = 
+             "Bet Amount of " + betAmount + " requried to join game. <button class=\"buttons\" id=\"start-game\" onclick=\"joinGameConfirmHandler()\">Confirm</button> <br><br>"
+         }
+         
+     });
+}
+
+var joinGameConfirmHandler = function(){
+    TicTacToe.join({ from: accounts[0], gas: '3000000',  value: web3.utils.toWei(betAmount.toString(), "ether")}).then(function(res) {
+        player = 2;
+        document.querySelector('#player').innerHTML = "Player " + player;
+        document.querySelector('#bet-amount-field-join').innerHTML = "Game of " + betAmount + " ETH stakes joined."
+    });
+    
 }
 
 var clickHandler = function() {
