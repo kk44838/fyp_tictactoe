@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: Unlicense
-pragma solidity ^0.4.24;
+pragma solidity ^0.4.19;
 
 /**
  * @title TicTacToe contract
