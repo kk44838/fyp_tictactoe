@@ -180,8 +180,7 @@ contract TicTacToe {
         require(status == 4, "Game is Complete.");
         _;
         status = _getStatus();
-        if (status > 0 && status < 3  && !paidWinner) {
-          paidWinner = true;
+        if (status > 0 && status < 3) {
           payWinner();
         } else if (status == 3) {
           draw();
@@ -250,12 +249,18 @@ contract TicTacToe {
     }
 
     function draw() private {
-      players[0].transfer(betAmount);
-      players[1].transfer(betAmount);
+      if (!paidWinner) {
+        paidWinner = true;
+        players[0].transfer(betAmount);
+        players[1].transfer(betAmount);
+      } 
     }
 
     function payWinner() private {
-      players[status - 1].transfer(betAmount + betAmount);
+      if (!paidWinner) {
+        paidWinner = true;
+        players[status - 1].transfer(betAmount + betAmount);
+      }
     }
 }
 
