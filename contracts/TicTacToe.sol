@@ -44,7 +44,7 @@ contract TicTacToe {
       **/
     constructor(address opponent) public payable {
         require(msg.sender != opponent, "No self play.");
-         require(msg.value > 0, "Bet too small");
+        require(msg.value > 0, "Bet too small");
 
         betAmount = msg.value;
         players[0] = msg.sender;
@@ -56,6 +56,7 @@ contract TicTacToe {
 
     function join() external payable  {
         require (playersJoined == 1, "Already joined");
+        require(msg.sender == players[1], "You are not the opponent");
         require(msg.value == betAmount, "Wrong bet amount.");
 
         playersJoined = 2;
