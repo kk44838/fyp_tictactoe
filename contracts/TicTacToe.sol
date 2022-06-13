@@ -5,6 +5,12 @@ pragma solidity ^0.4.19;
  * @title TicTacToe contract
  **/
 contract TicTacToe {
+    uint constant GAME_NOT_STARTED = 0;
+    uint constant GAME_PLAYER_1_WON = 1;
+    uint constant GAME_PLAYER_2_WON = 2;
+    uint constant GAME_DRAW = 3;
+    uint constant GAME_STARTED = 4;
+
     address[2] public players;
     uint8 public playersJoined;
     
@@ -20,6 +26,7 @@ contract TicTacToe {
      */
     uint public turn = 1;
 
+
     /**
      status
      0 - Not started
@@ -28,7 +35,7 @@ contract TicTacToe {
      3 - draw
      4- ongoing
      */
-    uint public status = 0;
+    uint public status = GAME_NOT_STARTED;
     bool private paidWinner = false;
     /**
     board status
@@ -50,7 +57,6 @@ contract TicTacToe {
         players[0] = msg.sender;
         players[1] = opponent;
         playersJoined = 1;
-
     }
 
 
@@ -60,7 +66,7 @@ contract TicTacToe {
         require(msg.value == betAmount, "Wrong bet amount.");
 
         playersJoined = 2;
-        status = 4;
+        status = GAME_STARTED;
     }
 
 
@@ -84,7 +90,7 @@ contract TicTacToe {
         }
       }
 
-      return 4;
+      return GAME_STARTED;
     }
 
     function winnerInColumn(uint[3][3] memory _board) private pure returns (uint){
@@ -94,7 +100,7 @@ contract TicTacToe {
         }
       }
 
-      return 4;
+      return GAME_STARTED;
     }
 
     function winnerInDiagonal(uint[3][3] memory _board) private pure returns (uint){
@@ -107,7 +113,7 @@ contract TicTacToe {
         return _board[0][0];
       }
 
-      return 4;
+      return GAME_STARTED;
     }
 
     function fullBoard(uint[3][3] memory _board) private pure returns (bool){
@@ -134,42 +140,27 @@ contract TicTacToe {
 
         uint cur_status = winnerInRow(board);
 
-        if (cur_status < 4) {
+        if (cur_status < GAME_STARTED) {
           return cur_status;
         }
 
         cur_status = winnerInColumn(board);
 
-        if (cur_status < 4) {
+        if (cur_status < GAME_STARTED) {
           return cur_status;
         }
 
         cur_status = winnerInDiagonal(board);
 
-        if (cur_status < 4) {
+        if (cur_status < GAME_STARTED) {
           return cur_status;
         }
 
         if (fullBoard(board)) {
-          return 3;
+          return GAME_DRAW;
         }
 
-        return 4;
-
-        // for (uint j=0; j < lines[pos].length; j++) {
-        //   if (_threeInALine(lines[pos][j][0], lines[pos][j][1], lines[pos][j][2])){
-        //     return board[pos];
-        //   }
-        // }
-
-
-        // for (uint k=0; k < board.length; k++) {
-        //   if (board[k] == 0) {
-        //     return 0;
-        //   }
-        // }
-
-        // return 3;
+        return GAME_STARTED;
     }
 
     /**
@@ -178,12 +169,12 @@ contract TicTacToe {
      */
     modifier _checkStatus {
         /*Please complete the code here.*/
-        require(status == 4, "Game is Complete.");
+        require(status == GAME_STARTED, "Game is Complete.");
         _;
         status = _getStatus();
-        if (status > 0 && status < 3) {
+        if (status > GAME_NOT_STARTED && status < GAME_DRAW) {
           payWinner();
-        } else if (status == 3) {
+        } else if (status == GAME_DRAW) {
           draw();
         }
     }
