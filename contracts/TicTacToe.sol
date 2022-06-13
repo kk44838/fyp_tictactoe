@@ -78,7 +78,7 @@ contract TicTacToe {
       * @param c position c
       */    
     function _threeInALine(uint a, uint b, uint c) private pure returns (bool){
-        /*Please complete the code here.*/
+       
         return (a != 0 && a == b && a == c);
 
     }
@@ -136,7 +136,7 @@ contract TicTacToe {
      * @return the status of the game
      */
     function _getStatus() private view returns (uint) {
-        /*Please complete the code here.*/
+       
 
         uint cur_status = winnerInRow(board);
 
@@ -168,7 +168,7 @@ contract TicTacToe {
      * update the status of the game after a player moving
      */
     modifier _checkStatus {
-        /*Please complete the code here.*/
+       
         require(status == GAME_STARTED, "Game is Complete.");
         _;
         status = _getStatus();
@@ -184,7 +184,7 @@ contract TicTacToe {
      * @return true if it's msg.sender's turn otherwise false
      */
     function myTurn() public view returns (bool) {
-       /*Please complete the code here.*/
+      
        return msg.sender == players[turn-1];
     }
 
@@ -193,7 +193,6 @@ contract TicTacToe {
      * update the turn after a move
      */
     modifier _myTurn() {
-      /*Please complete the code here.*/
       require(myTurn(), "Not your turn!");
       _;
       turn = (turn % 2) + 1;
@@ -207,7 +206,6 @@ contract TicTacToe {
      * @return true if valid otherwise false
      */
     function validMove(uint pos_x, uint pos_y) public view returns (bool) {
-      /*Please complete the code here.*/
       return pos_x >= 0 && pos_x < 9 && pos_y >= 0 && pos_y < 9 && board[pos_x][pos_y] == 0;
 
     }
@@ -218,7 +216,6 @@ contract TicTacToe {
      * @param pos_y the position the player places at
      */
     modifier _validMove(uint pos_x, uint pos_y) {
-      /*Please complete the code here.*/
       require (validMove(pos_x, pos_y), "Move is invalid.");
       _;
     }
