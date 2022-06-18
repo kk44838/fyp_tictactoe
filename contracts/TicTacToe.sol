@@ -83,44 +83,44 @@ contract TicTacToe {
 
     }
 
-    function winnerInRow(uint[3][3] memory _board) private pure returns (uint){
+    function winnerInRow() private view returns (uint){
       for (uint8 x = 0; x < 3; x++) {
-        if (_threeInALine(_board[x][0], _board[x][1], _board[x][2])) {
-          return _board[x][0];
+        if (_threeInALine(board[x][0], board[x][1], board[x][2])) {
+          return board[x][0];
         }
       }
 
       return GAME_STARTED;
     }
 
-    function winnerInColumn(uint[3][3] memory _board) private pure returns (uint){
+    function winnerInColumn() private view returns (uint){
       for (uint8 y = 0; y < 3; y++) {
-        if (_threeInALine(_board[0][y], _board[1][y], _board[2][y])) {
-          return _board[0][y];
+        if (_threeInALine(board[0][y], board[1][y], board[2][y])) {
+          return board[0][y];
         }
       }
 
       return GAME_STARTED;
     }
 
-    function winnerInDiagonal(uint[3][3] memory _board) private pure returns (uint){
+    function winnerInDiagonal() private view returns (uint){
       
-      if (_threeInALine(_board[0][0], _board[1][1], _board[2][2])) {
-        return _board[0][0];
+      if (_threeInALine(board[0][0], board[1][1], board[2][2])) {
+        return board[0][0];
       }
       
-      if (_threeInALine(_board[0][2], _board[1][1], _board[2][0])) {
-        return _board[0][0];
+      if (_threeInALine(board[0][2], board[1][1], board[2][0])) {
+        return board[0][0];
       }
 
       return GAME_STARTED;
     }
 
-    function fullBoard(uint[3][3] memory _board) private pure returns (bool){
+    function fullBoard() private view returns (bool){
       
-      for (uint j=0; j < _board.length; j++) {
-        for (uint k=0; k < _board.length; k++) {
-          if (_board[j][k] == 0) {
+      for (uint j=0; j < board.length; j++) {
+        for (uint k=0; k < board.length; k++) {
+          if (board[j][k] == 0) {
             return false;
           }
         }
@@ -138,25 +138,25 @@ contract TicTacToe {
     function _getStatus() private view returns (uint) {
        
 
-        uint cur_status = winnerInRow(board);
+        uint cur_status = winnerInRow();
 
         if (cur_status < GAME_STARTED) {
           return cur_status;
         }
 
-        cur_status = winnerInColumn(board);
+        cur_status = winnerInColumn();
 
         if (cur_status < GAME_STARTED) {
           return cur_status;
         }
 
-        cur_status = winnerInDiagonal(board);
+        cur_status = winnerInDiagonal();
 
         if (cur_status < GAME_STARTED) {
           return cur_status;
         }
 
-        if (fullBoard(board)) {
+        if (fullBoard()) {
           return GAME_DRAW;
         }
 
@@ -252,4 +252,3 @@ contract TicTacToe {
       }
     }
 }
-
