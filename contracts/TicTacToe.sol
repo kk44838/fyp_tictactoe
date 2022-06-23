@@ -11,7 +11,14 @@ contract TicTacToe {
     uint constant GAME_DRAW = 3;
     uint constant GAME_STARTED = 4;
 
+    /**
+      Players in the game
+     */
     address[2] public players;
+
+    /**
+      Number of players that have joined the game
+     */
     uint8 public playersJoined;
     
     /**
@@ -29,14 +36,19 @@ contract TicTacToe {
 
     /**
      status
-     0 - Not started
-     1 - players[0] won
-     2 - players[1] won
-     3 - draw
-     4- ongoing
+      GAME_NOT_STARTED = 0
+      GAME_PLAYER_1_WON = 1
+      GAME_PLAYER_2_WON = 2
+      GAME_DRAW = 3
+      GAME_STARTED = 4
      */
     uint public status = GAME_NOT_STARTED;
+
+    /**
+      Winner has been paid
+     */
     bool private paidWinner = false;
+
     /**
     board status
      0    1    2
@@ -59,7 +71,9 @@ contract TicTacToe {
         playersJoined = 1;
     }
 
-
+    /**
+      * @dev Join the game - game then starts
+      **/
     function join() external payable  {
         require (playersJoined == 1, "Already joined");
         require(msg.sender == players[1], "You are not the opponent");
