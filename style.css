@@ -130,6 +130,14 @@ h1 {
     font-size: small;
 }
 
+.inputs{
+    border: none;
+    border-bottom: 2px solid red;
+    background: #485b6e;
+    color: pink;
+    font-size: small;
+}
+
 #opponentAdress{
     border: none;
     border-bottom: 2px solid red;
