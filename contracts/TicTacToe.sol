@@ -97,6 +97,10 @@ contract TicTacToe {
 
     }
 
+    /**
+      * @dev Checks if there are three in a line in one of the rows
+      * @return player number of winner three in a line, otherwise return game status
+      */    
     function winnerInRow() private view returns (uint){
       for (uint8 x = 0; x < 3; x++) {
         if (_threeInALine(board[x][0], board[x][1], board[x][2])) {
@@ -107,6 +111,10 @@ contract TicTacToe {
       return GAME_STARTED;
     }
 
+    /**
+      * @dev Checks if there are three in a line in one of the columns
+      * @return player number of winner three in a line, otherwise return game status
+      */    
     function winnerInColumn() private view returns (uint){
       for (uint8 y = 0; y < 3; y++) {
         if (_threeInALine(board[0][y], board[1][y], board[2][y])) {
@@ -117,6 +125,10 @@ contract TicTacToe {
       return GAME_STARTED;
     }
 
+    /**
+      * @dev Checks if there are three in a line in one of the diagonals
+      * @return player number of winner three in a line, otherwise return game status
+      */   
     function winnerInDiagonal() private view returns (uint){
       
       if (_threeInALine(board[0][0], board[1][1], board[2][2])) {
@@ -130,6 +142,10 @@ contract TicTacToe {
       return GAME_STARTED;
     }
 
+    /**
+      * @dev Checks if the board is full
+      * @return if the board is full
+      */  
     function fullBoard() private view returns (bool){
       
       for (uint j=0; j < board.length; j++) {
@@ -147,7 +163,7 @@ contract TicTacToe {
 
     /**
      * @dev get the status of the game
-     * @return the status of the game
+     * @return status of the game
      */
     function _getStatus() private view returns (uint) {
        
@@ -178,8 +194,8 @@ contract TicTacToe {
     }
 
     /**
-     * @dev ensure the game is still ongoing before a player moving
-     * update the status of the game after a player moving
+     * @dev ensure the game is still ongoing before a player move
+     * update game status after a player move
      */
     modifier _checkStatus {
        
@@ -198,13 +214,12 @@ contract TicTacToe {
      * @return true if it's msg.sender's turn otherwise false
      */
     function myTurn() public view returns (bool) {
-      
        return msg.sender == players[turn-1];
     }
 
     /**
-     * @dev ensure it's a msg.sender's turn
-     * update the turn after a move
+     * @dev ensure it's a msg.sender's turn before player move
+     * update the turn after player move
      */
     modifier _myTurn() {
       require(myTurn(), "Not your turn!");
@@ -214,10 +229,10 @@ contract TicTacToe {
     }
 
     /**
-     * @dev check a move is valid
-     * @param pos_x the position the player places at
-     * @param pos_y the position the player places at
-     * @return true if valid otherwise false
+     * @dev check player move is valid
+     * @param pos_x the x position the player places at
+     * @param pos_y the y position the player places at
+     * @return true if valid player move otherwise false
      */
     function validMove(uint pos_x, uint pos_y) public view returns (bool) {
       return pos_x >= 0 && pos_x < 9 && pos_y >= 0 && pos_y < 9 && board[pos_x][pos_y] == 0;
@@ -225,9 +240,9 @@ contract TicTacToe {
     }
 
     /**
-     * @dev ensure a move is valid
-     * @param pos_x the position the player places at
-     * @param pos_y the position the player places at
+     * @dev ensure player move is valid before move is made
+     * @param pos_x the x position the player places at
+     * @param pos_y the y position the player places at
      */
     modifier _validMove(uint pos_x, uint pos_y) {
       require (validMove(pos_x, pos_y), "Move is invalid.");
@@ -236,21 +251,24 @@ contract TicTacToe {
 
     /**
      * @dev a player makes a move
-     * @param pos_x the position the player places at
-     * @param pos_y the position the player places at
+     * @param pos_x the x position the player places at
+     * @param pos_y the y position the player places at
      */
     function move(uint pos_x, uint pos_y) public _validMove(pos_x, pos_y) _checkStatus _myTurn {
         board[pos_x][pos_y] = turn;
     }
 
     /**
-     * @dev show the current board
+     * @dev show the current board state
      * @return board
      */
     function showBoard() public view returns (uint[3][3]) {
       return board;
     }
 
+    /**
+     * @dev return funds to respective owners
+     */
     function draw() private {
       if (!paidWinner) {
         paidWinner = true;
@@ -259,6 +277,9 @@ contract TicTacToe {
       } 
     }
 
+    /**
+     * @dev award winner with winnings
+     */
     function payWinner() private {
       if (!paidWinner) {
         paidWinner = true;
